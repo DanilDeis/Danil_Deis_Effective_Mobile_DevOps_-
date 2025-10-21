@@ -1,0 +1,11 @@
+#/etc/systemd/system
+[Unit]
+Description=Test Script Service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/test.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

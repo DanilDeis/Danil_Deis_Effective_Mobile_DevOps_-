@@ -1,0 +1,11 @@
+#/etc/systemd/system
+[Unit]
+Description=Monitor process test and notify
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/monitor.sh
+
+[Install]
+WantedBy=multi-user.target

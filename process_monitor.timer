@@ -1,0 +1,15 @@
+#/etc/systemd/system
+[Unit]
+Description=Run process_monitor script every minute
+
+[Timer]
+OnUnitActiveSec=1min
+Unit=process_monitor.service 
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
+
+
+                                                             
