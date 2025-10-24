@@ -1,1 +1,0 @@
-{"dependencies":[["iniparse",["~> 1.4",">= 1.4.2"]],["vagrant-multipass",["= 0.1.2"]],["racc",["~> 1.4"]],["nokogiri",[">= 0"]],["vagrant-parallels",["= 2.4.7"]]],"checksum":"52d374e203f7a0ef77ca60d65bb52873496778dd1f103f620bee910f7df56d77","vagrant_version":"2.4.7"}
