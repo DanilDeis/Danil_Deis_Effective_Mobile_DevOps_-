@@ -1,14 +1,46 @@
-sudo mv test.service /etc/systemd/system/test.service
-sudo mv test.sh /usr/local/bin/test.sh
-sudo chmod +x /usr/local/bin/test.sh
-sudo systemctl daemon-reload
-sudo systemctl start test.service
+#!/bin/bash
+set -euo pipefail
 
-sudo mv process_monitor.service /etc/systemd/system/process_monitor.service
-sudo mv monitor.sh /usr/local/bin/monitor.sh
-sudo chmod +x /usr/local/bin/monitor.sh
-sudo mv process_monitor.timer /etc/systemd/system/process_monitor.timer
+log_error() {
+  echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR: $1" >&2
+}
+
+trap 'log_error "Script interrupted or failed"; exit 1' ERR INT TERM
+
+declare -A files_map=(
+  ["test.service"]="/etc/systemd/system/test.service"
+  ["test.sh"]="/usr/local/bin/test.sh"
+  ["process_monitor.service"]="/etc/systemd/system/process_monitor.service"
+  ["monitor.sh"]="/usr/local/bin/monitor.sh"
+  ["process_monitor.timer"]="/etc/systemd/system/process_monitor.timer"
+)
+
+
+for src in "${!files_map[@]}"; do
+  dest="${files_map[$src]}"
+  if ! sudo cp "$src" "$dest"; then
+    log_error "Failed to copy $src to $dest"
+    exit 1
+  fi
+  echo "Копируем файл $src в $dest"
+
+  if [[ "$dest" == /usr/local/bin/* ]]; then
+    sudo chmod +x "$dest"
+    echo "Делаем файл $dest исполняемым"
+  fi
+done
+
 
 sudo systemctl daemon-reload
-sudo systemctl start process_monitor.service
-sudo systemctl start process_monitor.timer
+echo "Обновляем конфигурацию systemd"
+
+
+for dest in "${files_map[@]}"; do
+  basefile=$(basename "$dest")
+  
+  if [[ "$dest" == *.service ]] || [[ "$dest" == *.timer ]]; then
+    sudo systemctl restart "$basefile"
+    sudo systemctl enable "$basefile"
+    echo "Перезапускаем и включаем $basefile"
+  fi
+done
